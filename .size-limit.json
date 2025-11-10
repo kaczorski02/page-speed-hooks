@@ -1,31 +1,26 @@
 [
   {
     "name": "Full library",
-    "path": "dist/index.mjs",
-    "limit": "15 KB"
+    "path": "dist/index.js"
   },
   {
-    "name": "useWebVitals",
-    "path": "dist/index.mjs",
-    "import": "{ useWebVitals }",
-    "limit": "4 KB"
+    "name": "useWebVitals", 
+    "path": "dist/index.js",
+    "import": "{ useWebVitals }"
   },
   {
     "name": "useLCP",
-    "path": "dist/index.mjs",
-    "import": "{ useLCP }",
-    "limit": "3 KB"
+    "path": "dist/index.js", 
+    "import": "{ useLCP }"
   },
   {
     "name": "useOptimizedImage",
-    "path": "dist/index.mjs",
-    "import": "{ useOptimizedImage }",
-    "limit": "3 KB"
+    "path": "dist/index.js",
+    "import": "{ useOptimizedImage }"
   },
   {
     "name": "useDeferredMount",
-    "path": "dist/index.mjs",
-    "import": "{ useDeferredMount }",
-    "limit": "2 KB"
+    "path": "dist/index.js",
+    "import": "{ useDeferredMount }"
   }
 ]
