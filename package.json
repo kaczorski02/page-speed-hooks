@@ -1,0 +1,112 @@
+{
+  "name": "@page-speed/hooks",
+  "version": "0.1.0",
+  "description": "Performance-optimized React hooks for Core Web Vitals, responsive images, lazy loading, and resource management. Drop-in implementations of web.dev best practices with zero configuration.",
+  "keywords": [
+    "react",
+    "hooks",
+    "performance",
+    "web-vitals",
+    "core-web-vitals",
+    "LCP",
+    "CLS",
+    "INP",
+    "FCP",
+    "TTFB",
+    "page-speed",
+    "optimization",
+    "lazy-load",
+    "responsive-images",
+    "resource-hints",
+    "web.dev",
+    "lighthouse",
+    "pagespeed",
+    "seo",
+    "tree-shakeable"
+  ],
+  "homepage": "https://github.com/opensite-ai/page-speed-hooks#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opensite-ai/page-speed-hooks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/opensite-ai/page-speed-hooks/issues"
+  },
+  "author": "OpenSite AI (https://opensite.ai)",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./web-vitals": {
+      "types": "./dist/web-vitals.d.ts",
+      "import": "./dist/web-vitals.mjs",
+      "require": "./dist/web-vitals.js"
+    },
+    "./media": {
+      "types": "./dist/media.d.ts",
+      "import": "./dist/media.mjs",
+      "require": "./dist/media.js"
+    },
+    "./resources": {
+      "types": "./dist/resources.d.ts",
+      "import": "./dist/resources.mjs",
+      "require": "./dist/resources.js"
+    },
+    "./network": {
+      "types": "./dist/network.d.ts",
+      "import": "./dist/network.mjs",
+      "require": "./dist/network.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "size": "size-limit",
+    "prepublishOnly": "pnpm run build && pnpm run test:ci"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^11.1.6",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@types/react": "^18.3.26",
+    "@types/react-dom": "^18.3.7",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "eslint": "^9.15.0",
+    "happy-dom": "^15.11.7",
+    "prettier": "^3.3.3",
+    "size-limit": "^11.1.6",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
+  },
+  "dependencies": {
+    "web-vitals": "^4.2.4"
+  },
+  "packageManager": "pnpm@9.14.4",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
