@@ -8,40 +8,36 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Dependencies
-node_modules
-/.pnp
-.pnp.js
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+*.tsbuildinfo
 
 # Testing
-/coverage
+coverage/
 
-# Next.js
-/.next/
-/out/
+# Environment
+.env
+.env.local
 
-# Production
-/build
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Misc
+# OS
 .DS_Store
-*.pem
-plate-playground-template/
+Thumbs.db
 
-# Debug
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Local env files
-.env*.local
-.env
-
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
+pnpm-debug.log*
 
 # Editor directories and files
 .vscode/*
