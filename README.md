@@ -1,10 +1,13 @@
-<img width="1200" height="630" alt="Page Speed React Hooks" src="https://github.com/user-attachments/assets/ffa6ff0c-6327-44d1-b420-7706f08edcb3" />
+<img width="1200" height="330" alt="page-speed-hooks-library" src="https://github.com/user-attachments/assets/1a0cdef2-06bc-47fb-a405-75de0e589c6f" />
 
-
-<div align="center">
+---
 
 # ⚡ @page-speed/hooks
 
+---
+
+<div align="center">
+  
 **Performance-optimized React hooks for Core Web Vitals, responsive images, lazy loading, and resource management.**
 
 Drop-in implementations of [web.dev](https://web.dev) best practices with zero configuration.
