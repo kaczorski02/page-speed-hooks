@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
+
 - `useCLS` hook for Cumulative Layout Shift optimization
 - `useINP` hook for Interaction to Next Paint optimization
 - `useResourceHints` hook for preload/prefetch management
@@ -16,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced documentation with interactive examples
 - Performance benchmarking dashboard
 - Community contribution guidelines
+
+## [0.1.1] - 2025-11-30
+
+### Added
 
 ---
 
