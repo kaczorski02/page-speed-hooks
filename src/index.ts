@@ -9,13 +9,19 @@
  */
 
 // Web Vitals
-export { useWebVitals, useLCP } from "./web-vitals";
+export { useWebVitals, useLCP, useCLS } from "./web-vitals";
 export type {
   Metric,
   WebVitalsOptions,
   WebVitalsState,
   LCPOptions,
   LCPState,
+  CLSOptions,
+  CLSState,
+  LayoutShiftEntry,
+  LayoutShiftAttribution,
+  CLSSessionWindow,
+  CLSIssue,
 } from "./web-vitals";
 
 // Media Optimization

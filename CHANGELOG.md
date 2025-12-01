@@ -5,11 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## Planned
 
-### Planned
-
-- `useCLS` hook for Cumulative Layout Shift optimization
 - `useINP` hook for Interaction to Next Paint optimization
 - `useResourceHints` hook for preload/prefetch management
 - `useAdaptiveVideo` hook for responsive video loading
@@ -17,6 +14,102 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced documentation with interactive examples
 - Performance benchmarking dashboard
 - Community contribution guidelines
+
+## [0.1.2] - 2025-12-01
+
+### Added
+
+#### `useCLS` Hook - Cumulative Layout Shift Optimization
+
+Comprehensive hook for tracking, analyzing, and optimizing Cumulative Layout Shift (CLS). Implements all web.dev best practices with real-time measurement, attribution data, issue detection, and optimization utilities.
+
+**Core Features:**
+
+- **Real-time CLS Measurement** - Tracks CLS value using the official `web-vitals` library with proper session windowing
+- **Rating Calculation** - Automatic rating based on web.dev thresholds (Good ≤0.1, Needs Improvement 0.1-0.25, Poor >0.25)
+- **Layout Shift Attribution** - Captures which elements shifted, with before/after position data
+- **Session Window Analysis** - Groups shifts into session windows per web.dev specification (1s gap, 5s max duration)
+- **Largest Shift Detection** - Identifies the main contributor to your CLS score
+
+**Issue Detection & Optimization Suggestions:**
+
+- `image-without-dimensions` - Images missing width/height attributes
+- `unsized-media` - Video/picture elements without explicit dimensions
+- `dynamic-content` - Late-loading content causing shifts
+- `web-font-shift` - Font loading causing text reflow
+- `ad-embed-shift` - Advertisements/embeds loading without reserved space
+- `animation-shift` - CSS animations using layout-affecting properties
+
+**Utility Functions:**
+
+- `getElementSelector(element)` - Get CSS selector for debugging shifted elements
+- `hasExplicitDimensions(element)` - Check if elements have width/height set
+- `getAspectRatio(width, height)` - Calculate aspect ratio for dimension recommendations
+- `reset()` - Reset CLS tracking (useful for SPA navigation)
+
+**Callbacks:**
+
+- `onMeasure(value, rating)` - Called when CLS is measured or updated
+- `onShift(entry)` - Called on each individual layout shift
+- `onIssue(issue)` - Called when optimization opportunities are detected
+
+**New Types:**
+
+```typescript
+interface CLSOptions {
+  threshold?: number;              // Target CLS (default: 0.1)
+  onMeasure?: (value, rating) => void;
+  onShift?: (entry: LayoutShiftEntry) => void;
+  onIssue?: (issue: CLSIssue) => void;
+  reportAllChanges?: boolean;      // Report all changes (default: false)
+  debug?: boolean;                 // Console warnings (default: true in dev)
+  detectIssues?: boolean;          // Enable issue detection (default: true)
+  trackAttribution?: boolean;      // Track shift attribution (default: true)
+}
+
+interface CLSState {
+  cls: number | null;
+  rating: 'good' | 'needs-improvement' | 'poor' | null;
+  isLoading: boolean;
+  entries: LayoutShiftEntry[];
+  largestShift: LayoutShiftEntry | null;
+  sessionWindows: CLSSessionWindow[];
+  largestSessionWindow: CLSSessionWindow | null;
+  issues: CLSIssue[];
+  shiftCount: number;
+  hasPostInteractionShifts: boolean;
+  utils: { /* utility functions */ };
+}
+```
+
+**Example Usage:**
+
+```tsx
+import { useCLS } from '@page-speed/hooks';
+
+function App() {
+  const { cls, rating, issues, utils } = useCLS({
+    threshold: 0.1,
+    onMeasure: (value, rating) => analytics.track('CLS', { value, rating }),
+    onIssue: (issue) => console.warn('CLS Issue:', issue.suggestion),
+  });
+
+  return (
+    <div>
+      <p>CLS: {cls?.toFixed(3) ?? 'Measuring...'} ({rating})</p>
+      {issues.map((issue, i) => (
+        <p key={i}>{issue.suggestion}</p>
+      ))}
+    </div>
+  );
+}
+```
+
+**Web.dev References:**
+
+- [Cumulative Layout Shift (CLS)](https://web.dev/cls/)
+- [Optimize CLS](https://web.dev/optimize-cls/)
+- [Debug Layout Shifts](https://web.dev/debug-layout-shifts/)
 
 ## [0.1.1] - 2025-11-30
 

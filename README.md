@@ -189,6 +189,446 @@ function Hero() {
 
 ---
 
+#### `useCLS(options?)`
+
+Comprehensive hook for tracking, analyzing, and optimizing Cumulative Layout Shift (CLS). Provides real-time measurement, layout shift attribution, automatic issue detection, and optimization utilities.
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+
+function App() {
+  const { cls, rating, entries, issues, largestShift, utils } = useCLS({
+    threshold: 0.1,
+    onMeasure: (value, rating) => {
+      console.log(`CLS: ${value.toFixed(3)} (${rating})`);
+    },
+    onIssue: (issue) => {
+      console.warn("CLS Issue:", issue.type, issue.suggestion);
+    },
+  });
+
+  return (
+    <div>
+      <p>CLS: {cls?.toFixed(3) ?? "Measuring..."}</p>
+      <p>Rating: {rating}</p>
+      <p>Layout Shifts: {entries.length}</p>
+    </div>
+  );
+}
+```
+
+**Options:**
+
+- `threshold?: number` - Target CLS threshold (default: 0.1)
+- `onMeasure?: (value, rating) => void` - Called when CLS is measured
+- `onShift?: (entry) => void` - Called on each layout shift
+- `onIssue?: (issue) => void` - Called when optimization opportunity detected
+- `reportAllChanges?: boolean` - Report all changes (default: false)
+- `debug?: boolean` - Enable console warnings (default: true in development)
+- `detectIssues?: boolean` - Enable automatic issue detection (default: true)
+- `trackAttribution?: boolean` - Track which elements shifted (default: true)
+
+**Returns:**
+
+```typescript
+{
+  cls: number | null;                    // Current CLS value
+  rating: 'good' | 'needs-improvement' | 'poor' | null;
+  isLoading: boolean;                    // Measurement in progress
+  entries: LayoutShiftEntry[];           // Individual shift entries
+  largestShift: LayoutShiftEntry | null; // Biggest contributor
+  sessionWindows: CLSSessionWindow[];    // Grouped shift windows
+  largestSessionWindow: CLSSessionWindow | null;
+  issues: CLSIssue[];                    // Detected optimization opportunities
+  shiftCount: number;                    // Total shifts detected
+  hasPostInteractionShifts: boolean;     // Shifts after user interaction
+  utils: {
+    getElementSelector: (element) => string | null;
+    hasExplicitDimensions: (element) => boolean;
+    getAspectRatio: (width, height) => { ratio: string; decimal: number };
+    reset: () => void;
+  };
+}
+```
+
+**CLS Thresholds (web.dev):**
+
+- **Good:** ≤ 0.1
+- **Needs Improvement:** 0.1 - 0.25
+- **Poor:** > 0.25
+
+**Web.dev Reference:** [Optimize CLS](https://web.dev/cls/)
+
+---
+
+##### CLS Use Cases
+
+###### Basic CLS Monitoring
+
+Track CLS and send to analytics:
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+
+function PerformanceMonitor() {
+  useCLS({
+    onMeasure: (value, rating) => {
+      // Send to your analytics service
+      analytics.track("CLS", {
+        value,
+        rating,
+        page: window.location.pathname,
+      });
+    },
+  });
+
+  return null; // Invisible monitoring component
+}
+```
+
+###### Real-time CLS Dashboard
+
+Display live CLS metrics in development:
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+
+function CLSDashboard() {
+  const { cls, rating, shiftCount, largestShift, issues } = useCLS({
+    reportAllChanges: true,
+  });
+
+  return (
+    <div className="cls-dashboard">
+      <h3>CLS Monitor</h3>
+      <div className={`metric ${rating}`}>
+        <span>CLS Score:</span>
+        <strong>{cls?.toFixed(4) ?? "—"}</strong>
+      </div>
+      <p>Total Shifts: {shiftCount}</p>
+
+      {largestShift && (
+        <div>
+          <h4>Largest Shift</h4>
+          <p>Value: {largestShift.value.toFixed(4)}</p>
+          <p>Elements: {largestShift.sources.map((s) => s.node).join(", ")}</p>
+        </div>
+      )}
+
+      {issues.length > 0 && (
+        <div>
+          <h4>Optimization Opportunities</h4>
+          <ul>
+            {issues.map((issue, i) => (
+              <li key={i}>
+                <strong>{issue.type}</strong>: {issue.suggestion}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+###### Detecting Images Without Dimensions
+
+Automatically find images causing CLS:
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+
+function ImageAudit() {
+  const { issues, utils } = useCLS({
+    detectIssues: true,
+    onIssue: (issue) => {
+      if (issue.type === "image-without-dimensions") {
+        console.error(
+          `🖼️ Image missing dimensions: ${issue.element}\n` +
+            `Suggestion: ${issue.suggestion}`
+        );
+      }
+    },
+  });
+
+  // Find all images and check dimensions
+  const auditImages = () => {
+    document.querySelectorAll("img").forEach((img) => {
+      if (!utils.hasExplicitDimensions(img)) {
+        const { ratio } = utils.getAspectRatio(
+          img.naturalWidth,
+          img.naturalHeight
+        );
+        console.warn(
+          `Image needs dimensions: ${utils.getElementSelector(img)}\n` +
+            `Add: width="${img.naturalWidth}" height="${img.naturalHeight}"\n` +
+            `Or CSS: aspect-ratio: ${ratio};`
+        );
+      }
+    });
+  };
+
+  return <button onClick={auditImages}>Audit Images</button>;
+}
+```
+
+###### Font Loading CLS Prevention
+
+Monitor and optimize web font shifts:
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+
+function FontLoadingMonitor() {
+  const { issues } = useCLS({
+    onIssue: (issue) => {
+      if (issue.type === "web-font-shift") {
+        console.warn(
+          "Font-related layout shift detected!\n" +
+            "Consider:\n" +
+            "1. Preload critical fonts: <link rel='preload' href='font.woff2' as='font'>\n" +
+            "2. Use font-display: optional\n" +
+            "3. Match fallback font metrics with size-adjust"
+        );
+      }
+    },
+  });
+
+  const fontIssues = issues.filter((i) => i.type === "web-font-shift");
+
+  return fontIssues.length > 0 ? (
+    <div className="warning">
+      ⚠️ {fontIssues.length} font-related layout shifts detected
+    </div>
+  ) : null;
+}
+```
+
+###### Ad Container Space Reservation
+
+Prevent ad-related CLS:
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+
+function AdContainer({ slotId, minHeight = 250 }) {
+  const { issues } = useCLS({
+    onIssue: (issue) => {
+      if (
+        issue.type === "ad-embed-shift" &&
+        issue.element?.includes(slotId)
+      ) {
+        console.warn(`Ad slot ${slotId} caused layout shift of ${issue.contribution}`);
+      }
+    },
+  });
+
+  return (
+    <div
+      id={slotId}
+      style={{
+        minHeight: `${minHeight}px`,
+        width: "100%",
+        backgroundColor: "#f0f0f0",
+      }}
+    >
+      {/* Ad loads here */}
+    </div>
+  );
+}
+```
+
+###### SPA Navigation CLS Reset
+
+Reset CLS tracking on route changes:
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+function SPACLSTracker() {
+  const location = useLocation();
+  const { cls, rating, utils } = useCLS({
+    onMeasure: (value, rating) => {
+      analytics.track("CLS", {
+        value,
+        rating,
+        route: location.pathname,
+      });
+    },
+  });
+
+  // Reset CLS tracking on route change
+  useEffect(() => {
+    utils.reset();
+  }, [location.pathname, utils]);
+
+  return null;
+}
+```
+
+###### Conditional Rendering with Skeleton
+
+Prevent CLS with skeleton screens:
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+import { useState, useEffect } from "react";
+
+function ProductCard({ productId }) {
+  const [product, setProduct] = useState(null);
+  const { utils } = useCLS();
+
+  useEffect(() => {
+    fetchProduct(productId).then(setProduct);
+  }, [productId]);
+
+  // Skeleton maintains layout while loading
+  if (!product) {
+    return (
+      <div style={{ aspectRatio: "4 / 3", minHeight: "200px" }}>
+        <div className="skeleton-image" style={{ height: "150px" }} />
+        <div className="skeleton-text" style={{ height: "20px", marginTop: "10px" }} />
+        <div className="skeleton-text" style={{ height: "16px", marginTop: "8px" }} />
+      </div>
+    );
+  }
+
+  // Calculate recommended aspect ratio
+  const { ratio } = utils.getAspectRatio(product.imageWidth, product.imageHeight);
+
+  return (
+    <div>
+      <img
+        src={product.image}
+        alt={product.name}
+        width={product.imageWidth}
+        height={product.imageHeight}
+        style={{ aspectRatio: ratio }}
+      />
+      <h3>{product.name}</h3>
+      <p>{product.description}</p>
+    </div>
+  );
+}
+```
+
+###### Animation Shift Detection
+
+Detect animations causing CLS:
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+
+function AnimationMonitor() {
+  const { issues } = useCLS({
+    onIssue: (issue) => {
+      if (issue.type === "animation-shift") {
+        console.warn(
+          `Animation causing layout shift on ${issue.element}\n` +
+            "Fix: Use transform-based animations instead of top/left/width/height\n" +
+            "Bad:  animation: slide { from { left: 0 } to { left: 100px } }\n" +
+            "Good: animation: slide { from { transform: translateX(0) } to { transform: translateX(100px) } }"
+        );
+      }
+    },
+  });
+
+  return null;
+}
+```
+
+###### Complete CLS Optimization Component
+
+Full-featured CLS monitoring and reporting:
+
+```tsx
+import { useCLS } from "@page-speed/hooks";
+import { useCallback } from "react";
+
+function CLSOptimizer({ onReport }) {
+  const {
+    cls,
+    rating,
+    entries,
+    issues,
+    largestShift,
+    sessionWindows,
+    shiftCount,
+    utils,
+  } = useCLS({
+    threshold: 0.1,
+    reportAllChanges: true,
+    onMeasure: (value, rating) => {
+      if (rating === "poor") {
+        console.error(`Poor CLS detected: ${value.toFixed(3)}`);
+      }
+    },
+    onShift: (entry) => {
+      if (entry.value > 0.05) {
+        console.warn("Significant layout shift:", entry.sources);
+      }
+    },
+    onIssue: (issue) => {
+      console.info(`CLS Issue [${issue.type}]:`, issue.suggestion);
+    },
+  });
+
+  const generateReport = useCallback(() => {
+    const report = {
+      score: cls,
+      rating,
+      totalShifts: shiftCount,
+      largestShiftValue: largestShift?.value,
+      largestShiftElements: largestShift?.sources.map((s) => s.node),
+      sessionWindowCount: sessionWindows.length,
+      issues: issues.map((i) => ({
+        type: i.type,
+        element: i.element,
+        contribution: i.contribution,
+        suggestion: i.suggestion,
+      })),
+      recommendations: issues.map((i) => i.suggestion),
+    };
+
+    onReport?.(report);
+    return report;
+  }, [cls, rating, shiftCount, largestShift, sessionWindows, issues, onReport]);
+
+  return (
+    <div className="cls-optimizer">
+      <div className={`cls-score cls-${rating}`}>
+        <span>CLS</span>
+        <strong>{cls?.toFixed(3) ?? "..."}</strong>
+        <span className="rating">{rating}</span>
+      </div>
+
+      <button onClick={generateReport}>Generate Report</button>
+
+      {issues.length > 0 && (
+        <details>
+          <summary>
+            {issues.length} Optimization{issues.length > 1 ? "s" : ""} Available
+          </summary>
+          <ul>
+            {issues.map((issue, i) => (
+              <li key={i}>
+                <code>{issue.type}</code>
+                <p>{issue.suggestion}</p>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
 ### 🖼️ Media Optimization
 
 #### `useOptimizedImage(options)`
@@ -524,12 +964,13 @@ Adding @page-speed/hooks to your project:
 import {
   useWebVitals,
   useLCP,
+  useCLS,
   useOptimizedImage,
   useDeferredMount,
 } from "@page-speed/hooks";
 
 // Web Vitals only
-import { useWebVitals, useLCP } from "@page-speed/hooks/web-vitals";
+import { useWebVitals, useLCP, useCLS } from "@page-speed/hooks/web-vitals";
 
 // Media only
 import { useOptimizedImage } from "@page-speed/hooks/media";
@@ -542,13 +983,24 @@ import { useDeferredMount } from "@page-speed/hooks/resources";
 
 ```tsx
 import type {
+  // Core metric types
   Metric,
   WebVitalsOptions,
   WebVitalsState,
+  // LCP types
   LCPOptions,
   LCPState,
+  // CLS types
+  CLSOptions,
+  CLSState,
+  LayoutShiftEntry,
+  LayoutShiftAttribution,
+  CLSSessionWindow,
+  CLSIssue,
+  // Media types
   UseOptimizedImageOptions,
   UseOptimizedImageState,
+  // Resource types
   UseDeferredMountOptions,
 } from "@page-speed/hooks";
 ```
