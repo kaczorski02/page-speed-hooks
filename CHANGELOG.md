@@ -490,6 +490,7 @@ No breaking changes expected for v0.x releases.
 ## Development Roadmap
 
 ### Phase 1 (Current - v0.1.0)
+
 - ✅ Core Web Vitals tracking
 - ✅ LCP optimization
 - ✅ Image optimization
@@ -497,16 +498,19 @@ No breaking changes expected for v0.x releases.
 - ✅ Production-ready library
 
 ### Phase 2 (v0.2.0 - Dec 2025)
-- 🔄 CLS hook for layout shift detection
-- 🔄 INP hook for interaction performance
+
+- ✅ CLS hook for layout shift detection
+- ✅ INP hook for interaction performance
 - 🔄 Enhanced documentation site
 
 ### Phase 3 (v0.3.0 - Jan 2026)
+
 - 🔄 Resource hints management
 - 🔄 Network-aware loading strategies
 - 🔄 Video optimization hook
 
 ### Phase 4 (v1.0.0 - Feb 2026)
+
 - 🔄 Stable API guarantees
 - 🔄 Framework-specific integrations
 - 🔄 Performance analytics dashboard
@@ -530,13 +534,16 @@ This is the initial release. See [README.md](./README.md) for setup instructions
 ## Dependencies
 
 ### Runtime
+
 - `web-vitals@^4.2.4` - Official Google Web Vitals metrics library
 
 ### Peer Dependencies
+
 - `react@>=16.8.0` - React with Hooks support
 - `react-dom@>=16.8.0` - React DOM
 
 ### Development Dependencies
+
 - `tsup@^8.3.5` - TypeScript bundler
 - `typescript@^5.7.2` - TypeScript compiler
 - `vitest@^2.1.5` - Test runner
@@ -548,6 +555,7 @@ This is the initial release. See [README.md](./README.md) for setup instructions
 ## Performance
 
 ### Bundle Impact
+
 - **Full library:** ~12 KB gzipped
 - **useWebVitals:** ~3.2 KB gzipped
 - **useLCP:** ~2.8 KB gzipped
@@ -555,6 +563,7 @@ This is the initial release. See [README.md](./README.md) for setup instructions
 - **useDeferredMount:** ~1.4 KB gzipped
 
 ### Runtime Performance
+
 - **Hook execution time:** < 1ms
 - **Memory overhead:** < 1MB per hook
 - **Re-render impact:** Zero (hooks don't trigger renders)
@@ -565,14 +574,17 @@ This is the initial release. See [README.md](./README.md) for setup instructions
 ## Known Issues & Limitations
 
 ### Navigation Type Support
+
 - `'restore'` navigation type requires web-vitals v4.0.0+
 - Older browser support available via polyfills
 
 ### IntersectionObserver
+
 - `useOptimizedImage` requires IntersectionObserver support
 - Fallback available for older browsers (loads immediately)
 
 ### requestIdleCallback
+
 - `useDeferredMount` with `priority: 'low'` requires requestIdleCallback
 - Falls back to setTimeout on unsupported browsers
 
@@ -586,13 +598,12 @@ This is the initial release. See [README.md](./README.md) for setup instructions
 
 ## License
 
-MIT © [OpenSite AI](https://opensite.ai)
+BSD 3 © [OpenSite AI](https://opensite.ai)
 
 ---
 
 ## See Also
 
-- [@page-speed/ultra-parser](https://github.com/opensite-ai/page-speed-ultra-parser) - Fastest TypeScript HTML parser
 - [web-vitals](https://github.com/GoogleChrome/web-vitals) - Official Google metrics library
 - [web.dev](https://web.dev) - Web performance best practices
 
