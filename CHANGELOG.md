@@ -22,6 +22,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### `useOptimizedImage` Enhancements
+
+- **Dynamic Size State** - New `size` property in return object that tracks the rendered image dimensions
+  - Returns `{ width: number, height: number }` reflecting current image size
+  - Uses `ResizeObserver` for real-time size tracking as images resize
+  - Falls back to `naturalWidth`/`naturalHeight` when element dimensions unavailable
+  - Supports explicit `width` and `height` props to override detected values
+
+- **OptixFlow API Integration** - Optional automatic image optimization via OptixFlow CDN
+  - New `optixFlowConfig` option with the following properties:
+    - `apiKey: string` - Your OptixFlow API key (required to enable optimization)
+    - `compressionLevel?: number` - Quality setting from 0-100 (default: 75)
+    - `renderedFileType?: 'avif' | 'webp' | 'jpeg' | 'png'` - Output format (default: 'avif')
+  - Automatically builds optimized CDN URLs with detected/specified dimensions
+  - Zero-config optimization when API key is provided
+  - Gracefully falls back to original `src` when OptixFlow is not configured
+
+#### New Options
+
+- `width?: number` - Explicit width in pixels (overrides detected width)
+- `height?: number` - Explicit height in pixels (overrides detected height)
+- `optixFlowConfig?: object` - OptixFlow API configuration for automatic image optimization
+
+#### Updated Return Type
+
+```typescript
+interface UseOptimizedImageState {
+  ref: (node: HTMLImageElement | null) => void;
+  src: string;
+  isLoaded: boolean;
+  isInView: boolean;
+  loading: 'lazy' | 'eager';
+  size: { width: number; height: number }; // NEW
+}
+```
+
 ---
 
 ## [0.1.0] - 2025-11-10

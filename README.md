@@ -193,13 +193,13 @@ function Hero() {
 
 #### `useOptimizedImage(options)`
 
-Lazy loads images below the fold with IntersectionObserver, automatically deferring loading until the element is visible.
+Lazy loads images below the fold with IntersectionObserver, automatically deferring loading until the element is visible. Optionally integrates with **OptixFlow** for automatic image optimization including compression, format conversion, and responsive sizing.
 
 ```tsx
 import { useOptimizedImage } from "@page-speed/hooks/media";
 
 function ProductImage() {
-  const { ref, src, isLoaded, loading } = useOptimizedImage({
+  const { ref, src, isLoaded, loading, size } = useOptimizedImage({
     src: "/product.jpg",
     eager: false,
     threshold: 0.1,
@@ -213,8 +213,39 @@ function ProductImage() {
       loading={loading}
       className={isLoaded ? "loaded" : "loading"}
       alt="Product"
-      width={800}
-      height={600}
+      width={size.width}
+      height={size.height}
+    />
+  );
+}
+```
+
+**With OptixFlow Integration:**
+
+```tsx
+import { useOptimizedImage } from "@page-speed/hooks/media";
+
+function OptimizedProductImage() {
+  const { ref, src, isLoaded, loading, size } = useOptimizedImage({
+    src: "https://example.com/product.jpg",
+    threshold: 0.1,
+    rootMargin: "50px",
+    optixFlowConfig: {
+      apiKey: "your-optixflow-api-key",
+      compressionLevel: 80,
+      renderedFileType: "avif",
+    },
+  });
+
+  return (
+    <img
+      ref={ref}
+      src={src} // Automatically optimized via OptixFlow CDN
+      loading={loading}
+      className={isLoaded ? "loaded" : "loading"}
+      alt="Product"
+      width={size.width}
+      height={size.height}
     />
   );
 }
@@ -226,16 +257,23 @@ function ProductImage() {
 - `eager?: boolean` - Load immediately (default: false)
 - `threshold?: number` - IntersectionObserver threshold (default: 0.1)
 - `rootMargin?: string` - IntersectionObserver root margin (default: '50px')
+- `width?: number` - Explicit width in pixels (overrides detected width)
+- `height?: number` - Explicit height in pixels (overrides detected height)
+- `optixFlowConfig?: object` - OptixFlow API configuration:
+  - `apiKey: string` - Your OptixFlow API key (required to enable)
+  - `compressionLevel?: number` - Quality 0-100 (default: 75)
+  - `renderedFileType?: 'avif' | 'webp' | 'jpeg' | 'png'` - Output format (default: 'avif')
 
 **Returns:**
 
 ```typescript
 {
   ref: (node) => void           // Attach to img element
-  src: string                   // Image source (empty until loaded)
+  src: string                   // Image source (empty until loaded, optimized if OptixFlow enabled)
   isLoaded: boolean             // Image has loaded
   isInView: boolean             // Element is in viewport
   loading: 'lazy' | 'eager'     // Loading strategy used
+  size: { width, height }       // Current rendered dimensions (dynamic)
 }
 ```
 
@@ -245,6 +283,8 @@ function ProductImage() {
 - Use `eager={false}` (default) for below-fold images
 - Increase `rootMargin` to preload before user reaches image
 - Set `threshold` lower for early loading (0.01) or higher for exact visibility (0.5)
+- Use `optixFlowConfig` for automatic image optimization (compression, format conversion, sizing)
+- The `size` property updates dynamically via ResizeObserver as images resize
 
 ---
 
