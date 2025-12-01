@@ -10,6 +10,7 @@
 export { useWebVitals } from "./useWebVitals";
 export { useLCP } from "./useLCP";
 export { useCLS } from "./useCLS";
+export { useINP } from "./useINP";
 
 export type {
   Metric,
@@ -23,4 +24,12 @@ export type {
   LayoutShiftAttribution,
   CLSSessionWindow,
   CLSIssue,
+  INPOptions,
+  INPState,
+  INPInteraction,
+  INPPhaseBreakdown,
+  INPScriptAttribution,
+  INPIssue,
+  INPIssueType,
+  INPInteractionType,
 } from "./types";

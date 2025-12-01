@@ -629,6 +629,398 @@ function CLSOptimizer({ onReport }) {
 
 ---
 
+#### `useINP(options?)`
+
+Comprehensive hook for tracking, analyzing, and optimizing Interaction to Next Paint (INP). Provides real-time measurement, phase breakdown analysis, issue detection, and optimization utilities.
+
+```tsx
+import { useINP } from "@page-speed/hooks";
+
+function App() {
+  const { inp, rating, slowestInteraction, issues, utils } = useINP({
+    threshold: 200,
+    onMeasure: (value, rating) => {
+      console.log(`INP: ${value}ms (${rating})`);
+    },
+    onIssue: (issue) => {
+      console.warn("INP Issue:", issue.type, issue.suggestion);
+    },
+  });
+
+  return (
+    <div>
+      <p>INP: {inp ? `${inp.toFixed(0)}ms` : "Measuring..."}</p>
+      <p>Rating: {rating}</p>
+      {slowestInteraction && (
+        <div>
+          <p>Slowest interaction: {slowestInteraction.target}</p>
+          <p>Input Delay: {slowestInteraction.phases.inputDelay.toFixed(0)}ms</p>
+          <p>Processing: {slowestInteraction.phases.processingDuration.toFixed(0)}ms</p>
+          <p>Presentation: {slowestInteraction.phases.presentationDelay.toFixed(0)}ms</p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+**Options:**
+
+- `threshold?: number` - Target INP in milliseconds (default: 200)
+- `onMeasure?: (value, rating) => void` - Called when INP is measured
+- `onInteraction?: (interaction) => void` - Called on each interaction
+- `onIssue?: (issue) => void` - Called when optimization opportunity detected
+- `reportAllChanges?: boolean` - Report all interactions (default: false)
+- `debug?: boolean` - Enable console warnings (default: true in development)
+- `detectIssues?: boolean` - Enable automatic issue detection (default: true)
+- `trackAttribution?: boolean` - Track interaction attribution (default: true)
+
+**Returns:**
+
+```typescript
+{
+  inp: number | null;                           // Current INP (ms)
+  rating: 'good' | 'needs-improvement' | 'poor' | null;
+  isLoading: boolean;                           // Measurement in progress
+  interactions: INPInteraction[];               // All tracked interactions
+  slowestInteraction: INPInteraction | null;    // Worst interaction
+  slowestPhases: INPPhaseBreakdown | null;      // Phase breakdown of slowest
+  issues: INPIssue[];                           // Detected optimization opportunities
+  interactionCount: number;                     // Total interactions
+  slowInteractionCount: number;                 // Interactions exceeding threshold
+  averageLatency: number | null;                // Average across all interactions
+  goodInteractionPercentage: number;            // % rated "good"
+  interactionsByType: { click, keypress, tap }; // Distribution by type
+  utils: {
+    getElementSelector: (element) => string | null;
+    isThirdPartyScript: (url) => boolean;
+    getSuggestions: (interaction) => string[];
+    reset: () => void;
+    recordInteraction: (latency, target?, type?) => void;
+  };
+}
+```
+
+**INP Thresholds (web.dev):**
+
+- **Good:** ≤ 200ms
+- **Needs Improvement:** 200ms - 500ms
+- **Poor:** > 500ms
+
+**Web.dev Reference:** [Optimize INP](https://web.dev/inp/)
+
+---
+
+##### INP Use Cases
+
+###### Basic INP Monitoring
+
+Track INP and send to analytics:
+
+```tsx
+import { useINP } from "@page-speed/hooks";
+
+function PerformanceMonitor() {
+  useINP({
+    onMeasure: (value, rating) => {
+      // Send to your analytics service
+      analytics.track("INP", {
+        value,
+        rating,
+        page: window.location.pathname,
+      });
+    },
+  });
+
+  return null; // Invisible monitoring component
+}
+```
+
+###### Real-time INP Dashboard
+
+Display live INP metrics in development:
+
+```tsx
+import { useINP } from "@page-speed/hooks";
+
+function INPDashboard() {
+  const {
+    inp,
+    rating,
+    interactionCount,
+    slowestInteraction,
+    slowestPhases,
+    issues,
+  } = useINP({
+    reportAllChanges: true,
+  });
+
+  return (
+    <div className="inp-dashboard">
+      <h3>INP Monitor</h3>
+      <div className={`metric ${rating}`}>
+        <span>INP Score:</span>
+        <strong>{inp ? `${inp.toFixed(0)}ms` : "—"}</strong>
+      </div>
+      <p>Total Interactions: {interactionCount}</p>
+
+      {slowestInteraction && slowestPhases && (
+        <div>
+          <h4>Slowest Interaction</h4>
+          <p>Target: {slowestInteraction.target}</p>
+          <p>Type: {slowestInteraction.type}</p>
+          <ul>
+            <li>Input Delay: {slowestPhases.inputDelay.toFixed(0)}ms</li>
+            <li>Processing: {slowestPhases.processingDuration.toFixed(0)}ms</li>
+            <li>Presentation: {slowestPhases.presentationDelay.toFixed(0)}ms</li>
+          </ul>
+        </div>
+      )}
+
+      {issues.length > 0 && (
+        <div>
+          <h4>Optimization Opportunities</h4>
+          <ul>
+            {issues.map((issue, i) => (
+              <li key={i}>
+                <strong>{issue.type}</strong>: {issue.suggestion}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+###### Phase Breakdown Analysis
+
+Identify which phase of interaction is causing slowness:
+
+```tsx
+import { useINP } from "@page-speed/hooks";
+
+function INPPhaseAnalyzer() {
+  const { slowestInteraction, slowestPhases, utils } = useINP({
+    onInteraction: (interaction) => {
+      const { phases } = interaction;
+
+      // Determine the bottleneck phase
+      if (phases.inputDelay > 50) {
+        console.warn(
+          `High input delay (${phases.inputDelay.toFixed(0)}ms) on ${interaction.target}.\n` +
+          "The main thread was busy. Consider:\n" +
+          "- Breaking up long tasks with scheduler.yield()\n" +
+          "- Using requestIdleCallback for non-critical work\n" +
+          "- Code splitting to reduce JavaScript on page load"
+        );
+      }
+
+      if (phases.processingDuration > 100) {
+        console.warn(
+          `Slow event handler (${phases.processingDuration.toFixed(0)}ms) on ${interaction.target}.\n` +
+          "Consider:\n" +
+          "- Debouncing/throttling event handlers\n" +
+          "- Moving heavy computation to web workers\n" +
+          "- Deferring non-visual work with setTimeout"
+        );
+      }
+
+      if (phases.presentationDelay > 50) {
+        console.warn(
+          `High presentation delay (${phases.presentationDelay.toFixed(0)}ms) on ${interaction.target}.\n` +
+          "Consider:\n" +
+          "- Reducing DOM size\n" +
+          "- Using content-visibility: auto for off-screen content\n" +
+          "- Simplifying CSS selectors"
+        );
+      }
+    },
+  });
+
+  return null;
+}
+```
+
+###### Third-Party Script Impact Detection
+
+Identify third-party scripts affecting INP:
+
+```tsx
+import { useINP } from "@page-speed/hooks";
+
+function ThirdPartyMonitor() {
+  const { topSlowScripts, utils } = useINP({
+    trackAttribution: true,
+    onIssue: (issue) => {
+      if (issue.type === "third-party-script") {
+        console.warn(
+          `Third-party script impacting INP:\n` +
+          `Script: ${issue.scriptURL}\n` +
+          `Impact: ${issue.contribution.toFixed(0)}ms\n` +
+          `Suggestion: ${issue.suggestion}`
+        );
+      }
+    },
+  });
+
+  // Display scripts causing slow interactions
+  return topSlowScripts.length > 0 ? (
+    <div className="warning">
+      <h4>Scripts Impacting Responsiveness</h4>
+      <ul>
+        {topSlowScripts.map((script, i) => (
+          <li key={i}>
+            <code>{script.url}</code>
+            <span>Total: {script.totalDuration.toFixed(0)}ms</span>
+            <span>({script.occurrences} occurrences)</span>
+            {script.isThirdParty && <span className="badge">3rd Party</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : null;
+}
+```
+
+###### SPA Navigation INP Reset
+
+Reset INP tracking on route changes:
+
+```tsx
+import { useINP } from "@page-speed/hooks";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+function SPAINPTracker() {
+  const location = useLocation();
+  const { inp, rating, utils } = useINP({
+    onMeasure: (value, rating) => {
+      analytics.track("INP", {
+        value,
+        rating,
+        route: location.pathname,
+      });
+    },
+  });
+
+  // Reset INP tracking on route change
+  useEffect(() => {
+    utils.reset();
+  }, [location.pathname, utils]);
+
+  return null;
+}
+```
+
+###### Complete INP Optimization Component
+
+Full-featured INP monitoring and reporting:
+
+```tsx
+import { useINP } from "@page-speed/hooks";
+import { useCallback } from "react";
+
+function INPOptimizer({ onReport }) {
+  const {
+    inp,
+    rating,
+    interactions,
+    issues,
+    slowestInteraction,
+    slowestPhases,
+    interactionCount,
+    slowInteractionCount,
+    averageLatency,
+    goodInteractionPercentage,
+    interactionsByType,
+    utils,
+  } = useINP({
+    threshold: 200,
+    reportAllChanges: true,
+    onMeasure: (value, rating) => {
+      if (rating === "poor") {
+        console.error(`Poor INP detected: ${value.toFixed(0)}ms`);
+      }
+    },
+    onInteraction: (interaction) => {
+      if (interaction.latency > 500) {
+        console.warn("Very slow interaction:", interaction.target);
+        console.warn("Suggestions:", utils.getSuggestions(interaction));
+      }
+    },
+    onIssue: (issue) => {
+      console.info(`INP Issue [${issue.type}]:`, issue.suggestion);
+    },
+  });
+
+  const generateReport = useCallback(() => {
+    const report = {
+      score: inp,
+      rating,
+      totalInteractions: interactionCount,
+      slowInteractions: slowInteractionCount,
+      averageLatency,
+      goodPercentage: goodInteractionPercentage,
+      distribution: interactionsByType,
+      slowestTarget: slowestInteraction?.target,
+      slowestLatency: slowestInteraction?.latency,
+      phases: slowestPhases,
+      issues: issues.map((i) => ({
+        type: i.type,
+        element: i.element,
+        contribution: i.contribution,
+        suggestion: i.suggestion,
+      })),
+      recommendations: issues.map((i) => i.suggestion),
+    };
+
+    onReport?.(report);
+    return report;
+  }, [
+    inp, rating, interactionCount, slowInteractionCount,
+    averageLatency, goodInteractionPercentage, interactionsByType,
+    slowestInteraction, slowestPhases, issues, onReport
+  ]);
+
+  return (
+    <div className="inp-optimizer">
+      <div className={`inp-score inp-${rating}`}>
+        <span>INP</span>
+        <strong>{inp ? `${inp.toFixed(0)}ms` : "..."}</strong>
+        <span className="rating">{rating}</span>
+      </div>
+
+      <div className="stats">
+        <p>Interactions: {interactionCount} ({goodInteractionPercentage.toFixed(0)}% good)</p>
+        <p>Average: {averageLatency ? `${averageLatency.toFixed(0)}ms` : "—"}</p>
+      </div>
+
+      <button onClick={generateReport}>Generate Report</button>
+
+      {issues.length > 0 && (
+        <details>
+          <summary>
+            {issues.length} Optimization{issues.length > 1 ? "s" : ""} Available
+          </summary>
+          <ul>
+            {issues.map((issue, i) => (
+              <li key={i}>
+                <code>{issue.type}</code>
+                <p>{issue.suggestion}</p>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
 ### 🖼️ Media Optimization
 
 #### `useOptimizedImage(options)`
@@ -965,12 +1357,13 @@ import {
   useWebVitals,
   useLCP,
   useCLS,
+  useINP,
   useOptimizedImage,
   useDeferredMount,
 } from "@page-speed/hooks";
 
 // Web Vitals only
-import { useWebVitals, useLCP, useCLS } from "@page-speed/hooks/web-vitals";
+import { useWebVitals, useLCP, useCLS, useINP } from "@page-speed/hooks/web-vitals";
 
 // Media only
 import { useOptimizedImage } from "@page-speed/hooks/media";
@@ -997,6 +1390,15 @@ import type {
   LayoutShiftAttribution,
   CLSSessionWindow,
   CLSIssue,
+  // INP types
+  INPOptions,
+  INPState,
+  INPInteraction,
+  INPPhaseBreakdown,
+  INPScriptAttribution,
+  INPIssue,
+  INPIssueType,
+  INPInteractionType,
   // Media types
   UseOptimizedImageOptions,
   UseOptimizedImageState,

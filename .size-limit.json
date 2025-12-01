@@ -4,14 +4,24 @@
     "path": "dist/index.js"
   },
   {
-    "name": "useWebVitals", 
+    "name": "useWebVitals",
     "path": "dist/index.js",
     "import": "{ useWebVitals }"
   },
   {
     "name": "useLCP",
-    "path": "dist/index.js", 
+    "path": "dist/index.js",
     "import": "{ useLCP }"
+  },
+  {
+    "name": "useCLS",
+    "path": "dist/index.js",
+    "import": "{ useCLS }"
+  },
+  {
+    "name": "useINP",
+    "path": "dist/index.js",
+    "import": "{ useINP }"
   },
   {
     "name": "useOptimizedImage",

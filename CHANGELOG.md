@@ -7,13 +7,141 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Planned
 
-- `useINP` hook for Interaction to Next Paint optimization
 - `useResourceHints` hook for preload/prefetch management
 - `useAdaptiveVideo` hook for responsive video loading
 - `useNetworkStatus` hook for connection-aware loading strategies
 - Enhanced documentation with interactive examples
 - Performance benchmarking dashboard
 - Community contribution guidelines
+
+## [0.1.3] - 2025-12-01
+
+### Added
+
+#### `useINP` Hook - Interaction to Next Paint Optimization
+
+Comprehensive hook for tracking, analyzing, and optimizing Interaction to Next Paint (INP). Implements all web.dev best practices with real-time measurement, interaction attribution, phase breakdown analysis, issue detection, and optimization utilities.
+
+**Core Features:**
+
+- **Real-time INP Measurement** - Tracks INP value using the official `web-vitals` library with proper interaction handling
+- **Rating Calculation** - Automatic rating based on web.dev thresholds (Good ≤200ms, Needs Improvement 200-500ms, Poor >500ms)
+- **Interaction Attribution** - Captures which elements received interactions, with event type and target information
+- **Phase Breakdown Analysis** - Breaks down latency into Input Delay, Processing Duration, and Presentation Delay
+- **Slowest Interaction Detection** - Identifies the main contributor to your INP score
+
+**Three-Phase Latency Analysis:**
+
+- `inputDelay` - Time from user interaction to event handler start (main thread busy)
+- `processingDuration` - Time spent executing event handlers
+- `presentationDelay` - Time from handler completion to next paint (rendering work)
+
+**Issue Detection & Optimization Suggestions:**
+
+- `high-input-delay` - Main thread was busy when interaction occurred
+- `heavy-event-handler` - Event handlers taking too long to execute
+- `high-presentation-delay` - Rendering is slow after handler completion
+- `third-party-script` - Third-party scripts impacting responsiveness
+- `long-task` - Long tasks blocking the main thread
+- `layout-thrashing` - Alternating DOM reads/writes causing forced layouts
+- `excessive-dom-size` - Large DOM affecting rendering performance
+
+**Utility Functions:**
+
+- `getElementSelector(element)` - Get CSS selector for debugging slow interaction targets
+- `isThirdPartyScript(url)` - Check if a script URL is from a third-party origin
+- `getSuggestions(interaction)` - Get actionable optimization suggestions for an interaction
+- `reset()` - Reset INP tracking (useful for SPA navigation)
+- `recordInteraction(latency, target?, type?)` - Manually record interactions for custom tracking
+
+**Callbacks:**
+
+- `onMeasure(value, rating)` - Called when INP is measured or updated
+- `onInteraction(interaction)` - Called on each detected interaction
+- `onIssue(issue)` - Called when optimization opportunities are detected
+
+**Statistics & Analytics:**
+
+- `interactionCount` - Total number of interactions detected
+- `slowInteractionCount` - Interactions exceeding the threshold
+- `averageLatency` - Average latency across all interactions
+- `goodInteractionPercentage` - Percentage of interactions rated "good"
+- `interactionsByType` - Distribution by click, keypress, and tap
+- `topSlowScripts` - Scripts most frequently associated with slow interactions
+
+**New Types:**
+
+```typescript
+interface INPOptions {
+  threshold?: number;              // Target INP (default: 200ms)
+  onMeasure?: (value, rating) => void;
+  onInteraction?: (interaction: INPInteraction) => void;
+  onIssue?: (issue: INPIssue) => void;
+  reportAllChanges?: boolean;      // Report all interactions (default: false)
+  debug?: boolean;                 // Console warnings (default: true in dev)
+  detectIssues?: boolean;          // Enable issue detection (default: true)
+  trackAttribution?: boolean;      // Track script attribution (default: true)
+  minInteractionLatency?: number;  // Minimum latency to track (default: 40ms)
+  longTaskThreshold?: number;      // Long task threshold (default: 50ms)
+}
+
+interface INPState {
+  inp: number | null;
+  rating: 'good' | 'needs-improvement' | 'poor' | null;
+  isLoading: boolean;
+  interactions: INPInteraction[];
+  slowestInteraction: INPInteraction | null;
+  slowestPhases: INPPhaseBreakdown | null;
+  issues: INPIssue[];
+  interactionCount: number;
+  slowInteractionCount: number;
+  averageLatency: number | null;
+  goodInteractionPercentage: number;
+  interactionsByType: { click: number; keypress: number; tap: number };
+  topSlowScripts: Array<{ url: string; totalDuration: number; occurrences: number }>;
+  utils: { /* utility functions */ };
+}
+
+interface INPPhaseBreakdown {
+  inputDelay: number;
+  processingDuration: number;
+  presentationDelay: number;
+}
+```
+
+**Example Usage:**
+
+```tsx
+import { useINP } from '@page-speed/hooks';
+
+function App() {
+  const { inp, rating, slowestInteraction, issues, utils } = useINP({
+    threshold: 200,
+    onMeasure: (value, rating) => analytics.track('INP', { value, rating }),
+    onIssue: (issue) => console.warn('INP Issue:', issue.suggestion),
+  });
+
+  return (
+    <div>
+      <p>INP: {inp ? `${inp.toFixed(0)}ms` : 'Measuring...'} ({rating})</p>
+      {slowestInteraction && (
+        <div>
+          <p>Slowest: {slowestInteraction.target}</p>
+          <p>Input Delay: {slowestInteraction.phases.inputDelay.toFixed(0)}ms</p>
+          <p>Processing: {slowestInteraction.phases.processingDuration.toFixed(0)}ms</p>
+          <p>Presentation: {slowestInteraction.phases.presentationDelay.toFixed(0)}ms</p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+**Web.dev References:**
+
+- [Interaction to Next Paint (INP)](https://web.dev/inp/)
+- [Optimize INP](https://web.dev/articles/optimize-inp/)
+- [Find Slow Interactions in the Field](https://web.dev/articles/find-slow-interactions-in-the-field/)
 
 ## [0.1.2] - 2025-12-01
 
